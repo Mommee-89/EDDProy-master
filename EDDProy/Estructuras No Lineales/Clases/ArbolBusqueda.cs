@@ -140,5 +140,172 @@ namespace EDDemo.Estructuras_No_Lineales
             Muestra(nivel + 1, nodo.Izq);
         }
 
+        public void PodarArbol(ref NodoBinario nodo)
+        {
+            if (nodo == null)
+                return;
+            PodarArbol(ref nodo.Izq);
+            PodarArbol(ref nodo.Der);
+            nodo = null;
+        }
+
+        public void PodarArbolCompleto()
+        {
+            if (Raiz == null)
+            {
+                Console.WriteLine("Arbol vacío");
+                return;
+            }
+
+            PodarArbol(ref Raiz);
+            Raiz = null;
+            Console.WriteLine("El árbol ha sido podado por completo");
+        }
+
+        public NodoBinario EliminarPredecesor(NodoBinario nodo, int valor)
+        {
+            if (nodo == null) return nodo;
+
+            if (valor < nodo.Dato)
+            {
+                nodo.Izq = EliminarPredecesor(nodo.Izq, valor);
+            }
+            else if (valor > nodo.Dato)
+            {
+                nodo.Der = EliminarPredecesor(nodo.Der, valor);
+            }
+            else
+            {
+                if (nodo.Izq != null && nodo.Der != null)
+                {
+                    NodoBinario predecesor = EncontrarMaximo(nodo.Izq);
+                    nodo.Dato = predecesor.Dato;
+                    nodo.Izq = EliminarPredecesor(nodo.Izq, predecesor.Dato);
+                }
+                else
+                {
+                    nodo = (nodo.Izq != null) ? nodo.Izq : nodo.Der;
+                }
+            }
+
+            return nodo;
+        }
+
+        private NodoBinario EncontrarMaximo(NodoBinario nodo)
+        {
+            while (nodo.Der != null)
+            {
+                nodo = nodo.Der;
+            }
+            return nodo;
+        }
+
+        public NodoBinario EliminarSucesor(NodoBinario nodo, int valor)
+        {
+            if (nodo == null) return nodo;
+
+            if (valor < nodo.Dato)
+            {
+                nodo.Izq = EliminarSucesor(nodo.Izq, valor);
+            }
+            else if (valor > nodo.Dato)
+            {
+                nodo.Der = EliminarSucesor(nodo.Der, valor);
+            }
+            else
+            {
+                if (nodo.Izq != null && nodo.Der != null)
+                {
+                    NodoBinario sucesor = EncontrarMinimo(nodo.Der);
+                    nodo.Dato = sucesor.Dato;
+                    nodo.Der = EliminarSucesor(nodo.Der, sucesor.Dato);
+                }
+                else
+                {
+                    nodo = (nodo.Izq != null) ? nodo.Izq : nodo.Der;
+                }
+            }
+
+            return nodo;
+        }
+
+        private NodoBinario EncontrarMinimo(NodoBinario nodo)
+        {
+            while (nodo.Izq != null)
+                nodo = nodo.Izq;
+            return nodo;
+        }
+
+        public void RecorridoPorNiveles()
+        {
+            if (Raiz == null)
+                return;
+
+            Queue<NodoBinario> cola = new Queue<NodoBinario>();
+            cola.Enqueue(Raiz);
+
+            strRecorrido = "";
+            while (cola.Count > 0)
+            {
+                NodoBinario nodoActual = cola.Dequeue();
+                strRecorrido += nodoActual.Dato + ", ";
+
+                if (nodoActual.Izq != null)
+                    cola.Enqueue(nodoActual.Izq);
+                if (nodoActual.Der != null)
+                    cola.Enqueue(nodoActual.Der);
+            }
+
+
+        }
+
+        public int Altura(NodoBinario nodo)
+        {
+            if (nodo == null)
+                return -1;
+            return 1 + Math.Max(Altura(nodo.Izq), Altura(nodo.Der));
+        }
+
+        public int ContarHojas(NodoBinario nodo)
+        {
+            if (nodo == null)
+                return 0;
+            if (nodo.Izq == null && nodo.Der == null)
+                return 1;
+            return ContarHojas(nodo.Izq) + ContarHojas(nodo.Der);
+        }
+
+        public int ContarNodos(NodoBinario nodo)
+        {
+            if (nodo == null)
+                return 0;
+            return 1 + ContarNodos(nodo.Izq) + ContarNodos(nodo.Der);
+        }
+
+        public bool EsCompleto(NodoBinario nodo, int indice, int numeroNodos)
+        {
+            if (nodo == null)
+                return true;
+
+            if (indice >= numeroNodos)
+                return false;
+
+            return EsCompleto(nodo.Izq, 2 * indice + 1, numeroNodos) &&
+                   EsCompleto(nodo.Der, 2 * indice + 2, numeroNodos);
+        }
+
+        public bool EsLleno(NodoBinario nodo)
+        {
+            if (nodo == null)
+                return true;
+
+            if ((nodo.Izq == null && nodo.Der == null) ||
+                (nodo.Izq != null && nodo.Der != null))
+            {
+                return EsLleno(nodo.Izq) && EsLleno(nodo.Der);
+            }
+
+            return false;
+        }
     }
 }
